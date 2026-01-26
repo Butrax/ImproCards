@@ -1,6 +1,6 @@
 'use client';
 
-import type { ImproTheme } from '@/lib/impro-data';
+import type { ImproTheme } from '@/lib/impro-types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '../ui/button';

@@ -1,25 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-
-export interface ImproCard {
-  id: string;
-  name: string;
-  themeName: string;
-  image: {
-    imageUrl: string;
-    description: string;
-    imageHint: string;
-  };
-}
-
-export interface ImproTheme {
-  name: string;
-  color: string;
-  cards: ImproCard[];
-}
+import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 
 export const generateThemes = (): ImproTheme[] => {
-  const cartesDirectory = path.join(process.cwd(), 'public', 'cartes');
+  const cartesDirectory = path.join(process.cwd(), 'public', 'Cartes');
 
   const themeColors = [
     'hsl(50, 85%, 80%)',
@@ -34,7 +18,7 @@ export const generateThemes = (): ImproTheme[] => {
   try {
     if (!fs.existsSync(cartesDirectory)) {
       console.warn(
-        "Le dossier 'public/cartes' n'existe pas. Aucune carte ne sera chargée."
+        "Le dossier 'public/Cartes' n'existe pas. Aucune carte ne sera chargée."
       );
       return [];
     }
@@ -64,7 +48,7 @@ export const generateThemes = (): ImproTheme[] => {
           name: formattedCardName,
           themeName: themeNameFormatted,
           image: {
-            imageUrl: `/cartes/${themeName}/${fileName}`,
+            imageUrl: `/Cartes/${themeName}/${fileName}`,
             description: formattedCardName,
             imageHint: formattedCardName
               .toLowerCase()

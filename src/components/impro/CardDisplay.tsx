@@ -1,6 +1,6 @@
 'use client';
 
-import type { ImproCard, ImproTheme } from '@/lib/impro-data';
+import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Sparkles } from 'lucide-react';

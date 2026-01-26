@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import type { ImproCard, ImproTheme } from '@/lib/impro-data';
+import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Header } from './Header';
 import { CardDisplay } from './CardDisplay';
 import { ControlsPanel } from './ControlsPanel';
