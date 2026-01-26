@@ -35,7 +35,7 @@ export function CardDisplay({ card, theme }: CardDisplayProps) {
                   width={600}
                   height={400}
                   data-ai-hint={card.image.imageHint}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div className="p-4 text-center">
