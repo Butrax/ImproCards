@@ -46,7 +46,7 @@ export const generateThemes = (): ImproTheme[] => {
 
       const allCardFiles = fs
         .readdirSync(themePath)
-        .filter(file => /\.(jpeg|jpg|png)$/i.test(file));
+        .filter(file => /\.(jpeg|jpg|png|gif|bmp)$/i.test(file));
       
       const excludedCardsSet = new Set(config.excludedCards || []);
       const includedCardFiles = allCardFiles.filter(fileName => !excludedCardsSet.has(fileName));

@@ -154,7 +154,7 @@ export function ThemeManager({
                                     onCheckedChange={() => handleCardToggle(cardFile)}
                                 />
                                 <Label htmlFor={`card-${cardFile}`} className="font-normal text-sm">
-                                    {cardFile.replace(/\.(jpeg|jpg|png)$/i, '').replace(/[-_]/g, ' ')}
+                                    {cardFile.replace(/\.(jpeg|jpg|png|gif|bmp)$/i, '').replace(/[-_]/g, ' ')}
                                 </Label>
                             </div>
                         ))}

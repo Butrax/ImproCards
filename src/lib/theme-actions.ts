@@ -30,7 +30,7 @@ export async function getThemesForManager(): Promise<ManagedTheme[]> {
         }
 
         const cardFiles = (await fs.readdir(themePath)).filter((file) =>
-          /\.(jpeg|jpg|png)$/i.test(file)
+          /\.(jpeg|jpg|png|gif|bmp)$/i.test(file)
         );
 
         const themeNameFormatted =
