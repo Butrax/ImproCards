@@ -15,6 +15,7 @@ type CardDisplayProps = {
 const SingleCardDisplay = ({ card, theme, totalDrawn }: { card: ImproCard; theme: ImproTheme; totalDrawn: number }) => {
   const defaultImageUrl = '/Cartes/défaut.png';
   const [imageUrl, setImageUrl] = useState(card.image.imageUrl);
+  const [isMarked, setIsMarked] = useState(false);
 
   useEffect(() => {
     setImageUrl(card.image.imageUrl);
@@ -55,9 +56,16 @@ const SingleCardDisplay = ({ card, theme, totalDrawn }: { card: ImproCard; theme
   }
 
   return (
-    <div className={cn('w-full shrink-0 animate-in fade-in zoom-in-95 duration-500', containerClass)}>
+    <div
+      className={cn('w-full shrink-0 animate-in fade-in zoom-in-95 duration-500 cursor-pointer', containerClass)}
+      onClick={() => setIsMarked(!isMarked)}
+    >
       <Card
-        className={cn('overflow-hidden shadow-2xl transition-all', borderClass)}
+        className={cn(
+          'overflow-hidden shadow-2xl transition-all',
+          borderClass,
+          isMarked && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+        )}
         style={{ borderColor: theme.color }}
       >
         <CardHeader className={cn('text-center', paddingClass)}>
