@@ -1,5 +1,7 @@
 import { ImproApp } from '@/components/impro/ImproApp';
+import { generateThemes } from '@/lib/impro-data';
 
 export default function Home() {
-  return <ImproApp />;
+  const themes = generateThemes();
+  return <ImproApp allThemes={themes} />;
 }

@@ -1,11 +1,15 @@
-import type { ImagePlaceholder } from './placeholder-images';
-import { PlaceHolderImages } from './placeholder-images';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface ImproCard {
   id: string;
   name: string;
   themeName: string;
-  image: ImagePlaceholder;
+  image: {
+    imageUrl: string;
+    description: string;
+    imageHint: string;
+  };
 }
 
 export interface ImproTheme {
@@ -14,43 +18,76 @@ export interface ImproTheme {
   cards: ImproCard[];
 }
 
-const getImage = (id: string): ImagePlaceholder => {
-  const img = PlaceHolderImages.find((p) => p.id === id);
-  if (!img) {
-    throw new Error(`Image with id ${id} not found.`);
-  }
-  return img;
-};
+export const generateThemes = (): ImproTheme[] => {
+  const cartesDirectory = path.join(process.cwd(), 'public', 'cartes');
 
-export const themes: ImproTheme[] = [
-  {
-    name: 'Lieux',
-    color: 'hsl(50, 85%, 80%)',
-    cards: [
-      { id: 'lieux-1', name: 'Plage Tropicale', themeName: 'Lieux', image: getImage('lieux-1') },
-      { id: 'lieux-2', name: 'Ville Futuriste', themeName: 'Lieux', image: getImage('lieux-2') },
-      { id: 'lieux-3', name: 'Forêt Enchantée', themeName: 'Lieux', image: getImage('lieux-3') },
-      { id: 'lieux-4', name: 'Manoir Hanté', themeName: 'Lieux', image: getImage('lieux-4') },
-    ],
-  },
-  {
-    name: 'Personnages',
-    color: 'hsl(190, 85%, 80%)',
-    cards: [
-      { id: 'personnages-1', name: 'Détective Privé', themeName: 'Personnages', image: getImage('personnages-1') },
-      { id: 'personnages-2', name: 'Pirate de l\'Espace', themeName: 'Personnages', image: getImage('personnages-2') },
-      { id: 'personnages-3', name: 'Reine Médiévale', themeName: 'Personnages', image: getImage('personnages-3') },
-      { id: 'personnages-4', name: 'Savant Fou', themeName: 'Personnages', image: getImage('personnages-4') },
-    ],
-  },
-  {
-    name: 'Objets',
-    color: 'hsl(300, 85%, 85%)',
-    cards: [
-      { id: 'objets-1', name: 'Boussole Magique', themeName: 'Objets', image: getImage('objets-1') },
-      { id: 'objets-2', name: 'Journal Intime Ancien', themeName: 'Objets', image: getImage('objets-2') },
-      { id: 'objets-3', name: 'Clé Mystérieuse', themeName: 'Objets', image: getImage('objets-3') },
-      { id: 'objets-4', name: 'Robot Défectueux', themeName: 'Objets', image: getImage('objets-4') },
-    ],
-  },
-];
+  const themeColors = [
+    'hsl(50, 85%, 80%)',
+    'hsl(190, 85%, 80%)',
+    'hsl(300, 85%, 85%)',
+    'hsl(20, 85%, 80%)',
+    'hsl(250, 85%, 85%)',
+    'hsl(100, 85%, 80%)',
+  ];
+  let colorIndex = 0;
+
+  try {
+    if (!fs.existsSync(cartesDirectory)) {
+      console.warn(
+        "Le dossier 'public/cartes' n'existe pas. Aucune carte ne sera chargée."
+      );
+      return [];
+    }
+
+    const themeDirectories = fs
+      .readdirSync(cartesDirectory, {withFileTypes: true})
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+    return themeDirectories.map(themeName => {
+      const themePath = path.join(cartesDirectory, themeName);
+      
+      const cardFiles = fs
+        .readdirSync(themePath)
+        .filter(file => /\.(jpeg|jpg|png)$/i.test(file));
+
+      const themeNameFormatted =
+        themeName.charAt(0).toUpperCase() + themeName.slice(1);
+
+      const cards: ImproCard[] = cardFiles.map(fileName => {
+        const cardName = path.parse(fileName).name.replace(/[-_]/g, ' ');
+        const formattedCardName =
+          cardName.charAt(0).toUpperCase() + cardName.slice(1);
+        
+        return {
+          id: `${themeName}-${cardName.replace(/\s+/g, '-').toLowerCase()}`,
+          name: formattedCardName,
+          themeName: themeNameFormatted,
+          image: {
+            imageUrl: `/cartes/${themeName}/${fileName}`,
+            description: formattedCardName,
+            imageHint: formattedCardName
+              .toLowerCase()
+              .split(' ')
+              .slice(0, 2)
+              .join(' '),
+          },
+        };
+      });
+
+      const theme: ImproTheme = {
+        name: themeNameFormatted,
+        color: themeColors[colorIndex % themeColors.length],
+        cards: cards,
+      };
+      colorIndex++;
+      return theme;
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la lecture des thèmes depuis le dossier:",
+      error
+    );
+    return [];
+  }
+};

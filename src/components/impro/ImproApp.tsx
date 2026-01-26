@@ -2,13 +2,12 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import type { ImproCard, ImproTheme } from '@/lib/impro-data';
-import { themes as allThemes } from '@/lib/impro-data';
 import { Header } from './Header';
 import { CardDisplay } from './CardDisplay';
 import { ControlsPanel } from './ControlsPanel';
 import { useToast } from '@/hooks/use-toast';
 
-export function ImproApp() {
+export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
   const [currentCard, setCurrentCard] = useState<ImproCard | null>(null);
   const [currentTheme, setCurrentTheme] = useState<ImproTheme | null>(null);
   const [selectedThemes, setSelectedThemes] = useState<string[]>(
@@ -37,7 +36,7 @@ export function ImproApp() {
     }
     
     return pool;
-  }, [selectedThemes, allowDuplicates, drawnCards]);
+  }, [selectedThemes, allowDuplicates, drawnCards, allThemes]);
 
   const handleDrawCard = () => {
     if (cardPool.length === 0) {
