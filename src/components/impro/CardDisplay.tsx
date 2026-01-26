@@ -1,10 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 type CardDisplayProps = {
   card: ImproCard | null;
@@ -13,6 +13,19 @@ type CardDisplayProps = {
 
 export function CardDisplay({ card, theme }: CardDisplayProps) {
   const cardKey = card ? `${card.themeName}-${card.name}` : 'placeholder';
+  const defaultImageUrl = '/Cartes/défaut.png';
+
+  const [imageUrl, setImageUrl] = useState(card?.image.imageUrl || '');
+
+  useEffect(() => {
+    if (card) {
+      setImageUrl(card.image.imageUrl);
+    }
+  }, [card]);
+
+  const handleImageError = () => {
+    setImageUrl(defaultImageUrl);
+  };
 
   return (
     <div className="flex flex-1 items-center justify-center p-4 md:p-8">
@@ -30,12 +43,13 @@ export function CardDisplay({ card, theme }: CardDisplayProps) {
             <CardContent className="p-0">
               <div className="aspect-[3/2] w-full bg-muted">
                 <Image
-                  src={card.image.imageUrl}
+                  src={imageUrl}
                   alt={card.image.description}
                   width={600}
                   height={400}
                   data-ai-hint={card.image.imageHint}
                   className="h-full w-full object-contain"
+                  onError={handleImageError}
                 />
               </div>
               <div className="p-4 text-center">
