@@ -40,6 +40,8 @@ export function ThemeManager({
   useEffect(() => {
     if (open) {
       setIsLoading(true);
+      setSelectedTheme(null);
+      setEditedConfig(null);
       getThemesForManager()
         .then(setThemes)
         .finally(() => setIsLoading(false));
@@ -99,9 +101,17 @@ export function ThemeManager({
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex h-full items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <>
+          <SheetHeader className="border-b px-6 pb-4">
+            <SheetTitle>Chargement des thèmes</SheetTitle>
+            <SheetDescription>
+              Veuillez patienter pendant que nous chargeons vos thèmes.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex flex-1 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        </>
       );
     }
 
