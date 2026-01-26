@@ -8,7 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
-import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2 } from 'lucide-react';
+import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 
 type ControlsPanelProps = {
@@ -20,6 +20,7 @@ type ControlsPanelProps = {
   players: string[];
   onPlayersChange: (players: string[]) => void;
   onDrawCard: () => void;
+  onReset: () => void;
   onOpenThemeManager: () => void;
 };
 
@@ -32,6 +33,7 @@ export function ControlsPanel({
   players,
   onPlayersChange,
   onDrawCard,
+  onReset,
   onOpenThemeManager,
 }: ControlsPanelProps) {
   const [newPlayer, setNewPlayer] = useState('');
@@ -157,6 +159,10 @@ export function ControlsPanel({
         <Button size="lg" className="w-full text-lg" onClick={onDrawCard}>
           <Wand2 className="mr-2 h-5 w-5" />
           Tirer une carte !
+        </Button>
+         <Button variant="outline" className="w-full" onClick={onReset}>
+          <RotateCcw className="mr-2 h-4 w-4" />
+          Réinitialiser le plateau
         </Button>
       </CardContent>
     </Card>

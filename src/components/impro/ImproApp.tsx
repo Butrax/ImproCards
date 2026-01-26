@@ -9,9 +9,13 @@ import { ControlsPanel } from './ControlsPanel';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeManager } from './ThemeManager';
 
+type DrawnItem = {
+  card: ImproCard;
+  theme: ImproTheme;
+};
+
 export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
-  const [currentCard, setCurrentCard] = useState<ImproCard | null>(null);
-  const [currentTheme, setCurrentTheme] = useState<ImproTheme | null>(null);
+  const [drawnStack, setDrawnStack] = useState<DrawnItem[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>(
     allThemes.map((t) => t.name)
   );
@@ -51,29 +55,9 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
       if (!allowDuplicates && drawnCards.size > 0) {
         toast({
           title: 'Toutes les cartes ont été tirées !',
-          description: 'Réinitialisation du paquet de cartes.',
+          description: 'Réinitialisation du paquet. Tirez à nouveau !',
         });
         setDrawnCards(new Set());
-        // We need to re-run with the reset deck
-        const freshPool = allThemes
-          .filter((theme) => selectedThemes.includes(theme.name))
-          .flatMap((theme) => theme.cards);
-        
-        if (freshPool.length === 0) {
-            toast({
-                title: 'Aucune carte à tirer',
-                description: 'Veuillez sélectionner au moins un thème.',
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        const newCard = freshPool[Math.floor(Math.random() * freshPool.length)];
-        const newTheme = allThemes.find(t => t.name === newCard.themeName) || null;
-        setCurrentCard(newCard);
-        setCurrentTheme(newTheme);
-        setDrawnCards(new Set([newCard.id]));
-
       } else {
          toast({
           title: 'Aucune carte à tirer',
@@ -85,15 +69,32 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
     }
 
     const newCard = cardPool[Math.floor(Math.random() * cardPool.length)];
-    const newTheme = allThemes.find(t => t.name === newCard.themeName) || null;
+    const newTheme = allThemes.find(t => t.name === newCard.themeName);
+
+    if (!newTheme) {
+      toast({
+        title: 'Erreur',
+        description: `Thème introuvable pour la carte "${newCard.name}".`,
+        variant: 'destructive',
+      });
+      return;
+    }
     
-    setCurrentCard(newCard);
-    setCurrentTheme(newTheme);
+    setDrawnStack(prev => [...prev, { card: newCard, theme: newTheme }]);
 
     if (!allowDuplicates) {
       setDrawnCards(prev => new Set(prev).add(newCard.id));
     }
   };
+
+  const handleReset = useCallback(() => {
+    setDrawnStack([]);
+    setDrawnCards(new Set());
+    toast({
+      title: 'Plateau réinitialisé',
+      description: 'Toutes les cartes tirées ont été retirées.',
+    });
+  }, [toast]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -108,9 +109,10 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           players={players}
           onPlayersChange={setPlayers}
           onDrawCard={handleDrawCard}
+          onReset={handleReset}
           onOpenThemeManager={() => setIsThemeManagerOpen(true)}
         />
-        <CardDisplay card={currentCard} theme={currentTheme} />
+        <CardDisplay drawnStack={drawnStack} />
       </main>
       <ThemeManager
         open={isThemeManagerOpen}
