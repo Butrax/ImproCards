@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "lieux-1",
+      "description": "Une plage tropicale",
+      "imageUrl": "https://images.unsplash.com/photo-1603477849227-705c424d1d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMGJlYWNofGVufDB8fHx8MTc2OTQyMTM3NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tropical beach"
+    },
+    {
+      "id": "lieux-2",
+      "description": "Une ville futuriste",
+      "imageUrl": "https://images.unsplash.com/photo-1519608487953-e999c86e7455?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmdXR1cmlzdGljJTIwY2l0eXxlbnwwfHx8fDE3NjkzMjEzNzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "futuristic city"
+    },
+    {
+      "id": "lieux-3",
+      "description": "Une forêt enchantée",
+      "imageUrl": "https://images.unsplash.com/photo-1518562180175-34a163b1a9a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxlbmNoYW50ZWQlMjBmb3Jlc3R8ZW58MHx8fHwxNzY5MzYwNzQyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "enchanted forest"
+    },
+    {
+      "id": "lieux-4",
+      "description": "Un manoir hanté",
+      "imageUrl": "https://images.unsplash.com/photo-1608993751944-e590f68d1c02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxoYXVudGVkJTIwbWFuc2lvbnxlbnwwfHx8fDE3Njk0MDQ3MDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "haunted mansion"
+    },
+    {
+      "id": "personnages-1",
+      "description": "Un détective privé",
+      "imageUrl": "https://images.unsplash.com/photo-1733689772868-f26cdbf04c85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwcml2YXRlJTIwZGV0ZWN0aXZlfGVufDB8fHx8MTc2OTQyMzA1M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "private detective"
+    },
+    {
+      "id": "personnages-2",
+      "description": "Un pirate de l'espace",
+      "imageUrl": "https://images.unsplash.com/photo-1758179761797-288f923a285f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGFjZSUyMHBpcmF0ZXxlbnwwfHx8fDE3NjkzMzg1MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "space pirate"
+    },
+    {
+      "id": "personnages-3",
+      "description": "Une reine médiévale",
+      "imageUrl": "https://images.unsplash.com/photo-1630497863121-1c7f1cb36e0d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtZWRpZXZhbCUyMHF1ZWVufGVufDB8fHx8MTc2OTQyMzA1M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "medieval queen"
+    },
+    {
+      "id": "personnages-4",
+      "description": "Un savant fou",
+      "imageUrl": "https://images.unsplash.com/photo-1595311182166-d63273ddc386?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYWQlMjBzY2llbnRpc3R8ZW58MHx8fHwxNzY5NDIzMDUzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mad scientist"
+    },
+    {
+      "id": "objets-1",
+      "description": "Une boussole magique",
+      "imageUrl": "https://images.unsplash.com/photo-1696219695041-8dddb603cd33?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWdpYyUyMGNvbXBhc3N8ZW58MHx8fHwxNzY5NDIzMDUzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "magic compass"
+    },
+    {
+      "id": "objets-2",
+      "description": "Un journal intime ancien",
+      "imageUrl": "https://images.unsplash.com/photo-1742105881125-c4874d19759d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YW5jaWVudCUyMGRpYXJ5fGVufDB8fHx8MTc2OTQyMzA1M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ancient diary"
+    },
+    {
+      "id": "objets-3",
+      "description": "Une clé mystérieuse",
+      "imageUrl": "https://images.unsplash.com/photo-1759215501954-8c1a18f97b11?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxteXN0ZXJpb3VzJTIwa2V5fGVufDB8fHx8MTc2OTQyMzA1M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mysterious key"
+    },
+    {
+      "id": "objets-4",
+      "description": "Un robot défectueux",
+      "imageUrl": "https://images.unsplash.com/photo-1574071744270-6b1c3fae0e4c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYXVsdHklMjByb2JvdHxlbnwwfHx8fDE3Njk0MjMwNTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "faulty robot"
+    }
+  ]
 }
