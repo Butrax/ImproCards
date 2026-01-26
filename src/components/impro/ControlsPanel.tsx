@@ -8,7 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
-import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw } from 'lucide-react';
+import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw, FolderKanban } from 'lucide-react';
 import { useState } from 'react';
 
 type ControlsPanelProps = {
@@ -17,6 +17,8 @@ type ControlsPanelProps = {
   onThemeToggle: (themeName: string) => void;
   allowDuplicates: boolean;
   onAllowDuplicatesChange: (checked: boolean) => void;
+  groupByTheme: boolean;
+  onGroupByThemeChange: (checked: boolean) => void;
   players: string[];
   onPlayersChange: (players: string[]) => void;
   onDrawCard: () => void;
@@ -30,6 +32,8 @@ export function ControlsPanel({
   onThemeToggle,
   allowDuplicates,
   onAllowDuplicatesChange,
+  groupByTheme,
+  onGroupByThemeChange,
   players,
   onPlayersChange,
   onDrawCard,
@@ -150,6 +154,17 @@ export function ControlsPanel({
                   id="allow-duplicates"
                   checked={allowDuplicates}
                   onCheckedChange={onAllowDuplicatesChange}
+                />
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <Label htmlFor="group-by-theme" className="flex items-center gap-2 text-base">
+                  <FolderKanban className="h-5 w-5" />
+                  Regrouper par thème
+                </Label>
+                <Switch
+                  id="group-by-theme"
+                  checked={groupByTheme}
+                  onCheckedChange={onGroupByThemeChange}
                 />
               </div>
             </AccordionContent>

@@ -20,6 +20,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
     allThemes.map((t) => t.name)
   );
   const [allowDuplicates, setAllowDuplicates] = useState(false);
+  const [groupByTheme, setGroupByTheme] = useState(false);
   const [drawnCards, setDrawnCards] = useState<Set<string>>(new Set());
   const [players, setPlayers] = useState<string[]>([]);
   const { toast } = useToast();
@@ -106,13 +107,15 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           onThemeToggle={handleThemeToggle}
           allowDuplicates={allowDuplicates}
           onAllowDuplicatesChange={setAllowDuplicates}
+          groupByTheme={groupByTheme}
+          onGroupByThemeChange={setGroupByTheme}
           players={players}
           onPlayersChange={setPlayers}
           onDrawCard={handleDrawCard}
           onReset={handleReset}
           onOpenThemeManager={() => setIsThemeManagerOpen(true)}
         />
-        <CardDisplay drawnStack={drawnStack} />
+        <CardDisplay drawnStack={drawnStack} groupByTheme={groupByTheme} />
       </main>
       <ThemeManager
         open={isThemeManagerOpen}
