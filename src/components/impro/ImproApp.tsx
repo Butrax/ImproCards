@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Header } from './Header';
 import { CardDisplay } from './CardDisplay';
 import { ControlsPanel } from './ControlsPanel';
 import { useToast } from '@/hooks/use-toast';
+import { ThemeManager } from './ThemeManager';
 
 export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
   const [currentCard, setCurrentCard] = useState<ImproCard | null>(null);
@@ -17,6 +19,8 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
   const [drawnCards, setDrawnCards] = useState<Set<string>>(new Set());
   const [players, setPlayers] = useState<string[]>([]);
   const { toast } = useToast();
+  const [isThemeManagerOpen, setIsThemeManagerOpen] = useState(false);
+  const router = useRouter();
 
   const handleThemeToggle = useCallback((themeName: string) => {
     setSelectedThemes((prev) =>
@@ -25,6 +29,10 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
         : [...prev, themeName]
     );
   }, []);
+
+  const handleThemesUpdate = useCallback(() => {
+    router.refresh();
+  }, [router]);
 
   const cardPool = useMemo(() => {
     let pool = allThemes
@@ -100,9 +108,15 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           players={players}
           onPlayersChange={setPlayers}
           onDrawCard={handleDrawCard}
+          onOpenThemeManager={() => setIsThemeManagerOpen(true)}
         />
         <CardDisplay card={currentCard} theme={currentTheme} />
       </main>
+      <ThemeManager
+        open={isThemeManagerOpen}
+        onOpenChange={setIsThemeManagerOpen}
+        onThemesUpdate={handleThemesUpdate}
+      />
     </div>
   );
 }

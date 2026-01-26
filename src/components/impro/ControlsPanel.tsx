@@ -8,7 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
-import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus } from 'lucide-react';
+import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 type ControlsPanelProps = {
@@ -20,6 +20,7 @@ type ControlsPanelProps = {
   players: string[];
   onPlayersChange: (players: string[]) => void;
   onDrawCard: () => void;
+  onOpenThemeManager: () => void;
 };
 
 export function ControlsPanel({
@@ -31,6 +32,7 @@ export function ControlsPanel({
   players,
   onPlayersChange,
   onDrawCard,
+  onOpenThemeManager,
 }: ControlsPanelProps) {
   const [newPlayer, setNewPlayer] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -55,8 +57,12 @@ export function ControlsPanel({
 
   return (
     <Card className="w-full md:w-96 lg:w-[450px] m-4 md:m-0 md:mr-4">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="font-headline text-2xl">Panneau de Contrôle</CardTitle>
+        <Button variant="ghost" size="icon" onClick={onOpenThemeManager}>
+            <Settings2 className="h-6 w-6" />
+            <span className="sr-only">Gérer les thèmes</span>
+        </Button>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <Accordion type="multiple" defaultValue={['themes', 'players']} className="w-full">

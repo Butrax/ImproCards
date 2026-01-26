@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { ImproCard, ImproTheme } from '@/lib/impro-types';
+import type { ImproCard, ImproTheme, ThemeConfig } from '@/lib/impro-types';
 
 export const generateThemes = (): ImproTheme[] => {
   const cartesDirectory = path.join(process.cwd(), 'public', 'Cartes');
+  const configFileName = 'theme.json';
 
-  const themeColors = [
+  const defaultThemeColors = [
     'hsl(50, 85%, 80%)',
     'hsl(190, 85%, 80%)',
     'hsl(300, 85%, 85%)',
@@ -24,27 +25,42 @@ export const generateThemes = (): ImproTheme[] => {
     }
 
     const themeDirectories = fs
-      .readdirSync(cartesDirectory, {withFileTypes: true})
+      .readdirSync(cartesDirectory, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
       .map(dirent => dirent.name);
 
     return themeDirectories.map(themeName => {
       const themePath = path.join(cartesDirectory, themeName);
+      const configPath = path.join(themePath, configFileName);
+      let config: ThemeConfig = {};
       
-      const cardFiles = fs
+      try {
+        if (fs.existsSync(configPath)) {
+            const rawConfig = fs.readFileSync(configPath, 'utf-8');
+            config = JSON.parse(rawConfig);
+        }
+      } catch (e) {
+        console.error(`Could not parse ${configPath}`, e)
+      }
+
+
+      const allCardFiles = fs
         .readdirSync(themePath)
         .filter(file => /\.(jpeg|jpg|png)$/i.test(file));
+      
+      const excludedCardsSet = new Set(config.excludedCards || []);
+      const includedCardFiles = allCardFiles.filter(fileName => !excludedCardsSet.has(fileName));
 
       const themeNameFormatted =
         themeName.charAt(0).toUpperCase() + themeName.slice(1);
 
-      const cards: ImproCard[] = cardFiles.map(fileName => {
+      const cards: ImproCard[] = includedCardFiles.map(fileName => {
         const cardName = path.parse(fileName).name.replace(/[-_]/g, ' ');
         const formattedCardName =
           cardName.charAt(0).toUpperCase() + cardName.slice(1);
         
         return {
-          id: `${themeName}-${cardName.replace(/\s+/g, '-').toLowerCase()}`,
+          id: `${themeName}-${fileName}`,
           name: formattedCardName,
           themeName: themeNameFormatted,
           image: {
@@ -58,13 +74,16 @@ export const generateThemes = (): ImproTheme[] => {
           },
         };
       });
+      
+      const themeColor = config.color || defaultThemeColors[colorIndex % defaultThemeColors.length];
+      colorIndex++;
 
       const theme: ImproTheme = {
         name: themeNameFormatted,
-        color: themeColors[colorIndex % themeColors.length],
+        color: themeColor,
         cards: cards,
       };
-      colorIndex++;
+      
       return theme;
     });
   } catch (error) {
