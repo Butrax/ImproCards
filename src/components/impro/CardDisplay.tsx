@@ -4,15 +4,17 @@ import { useState, useEffect } from 'react';
 import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
 
 type CardDisplayProps = {
   drawnStack: { card: ImproCard; theme: ImproTheme }[];
   groupByTheme: boolean;
+  onRemoveCard: (index: number) => void;
 };
 
-const SingleCardDisplay = ({ card, theme, totalDrawn }: { card: ImproCard; theme: ImproTheme; totalDrawn: number }) => {
+const SingleCardDisplay = ({ card, theme, totalDrawn, onRemove }: { card: ImproCard; theme: ImproTheme; totalDrawn: number, onRemove: () => void }) => {
   const defaultImageUrl = '/Cartes/défaut.png';
   const [imageUrl, setImageUrl] = useState(card.image.imageUrl);
   const [isMarked, setIsMarked] = useState(false);
@@ -57,12 +59,24 @@ const SingleCardDisplay = ({ card, theme, totalDrawn }: { card: ImproCard; theme
 
   return (
     <div
-      className={cn('w-full shrink-0 animate-in fade-in zoom-in-95 duration-500 cursor-pointer', containerClass)}
+      className={cn('relative group/card w-full shrink-0 animate-in fade-in zoom-in-95 duration-500 cursor-pointer', containerClass)}
       onClick={() => setIsMarked(!isMarked)}
     >
+        <Button
+            variant="destructive"
+            size="icon"
+            className="absolute top-1 right-1 z-10 h-6 w-6 rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity"
+            onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+            }}
+            aria-label="Retirer la carte"
+        >
+            <X className="h-4 w-4" />
+        </Button>
       <Card
         className={cn(
-          'overflow-hidden shadow-2xl transition-all',
+          'overflow-hidden shadow-2xl transition-all h-full',
           borderClass,
           isMarked && 'ring-4 ring-black ring-offset-2 ring-offset-background'
         )}
@@ -96,7 +110,7 @@ const SingleCardDisplay = ({ card, theme, totalDrawn }: { card: ImproCard; theme
 };
 
 
-export function CardDisplay({ drawnStack, groupByTheme }: CardDisplayProps) {
+export function CardDisplay({ drawnStack, groupByTheme, onRemoveCard }: CardDisplayProps) {
   if (drawnStack.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center p-4 md:p-8">
@@ -113,29 +127,30 @@ export function CardDisplay({ drawnStack, groupByTheme }: CardDisplayProps) {
   }
 
   if (groupByTheme) {
-    const groupedByTheme = drawnStack.reduce((acc, item) => {
+    const groupedByTheme = drawnStack.reduce((acc, item, index) => {
       const themeName = item.theme.name;
       if (!acc[themeName]) {
-        acc[themeName] = { theme: item.theme, cards: [] };
+        acc[themeName] = { theme: item.theme, items: [] };
       }
-      acc[themeName].cards.push(item.card);
+      acc[themeName].items.push({ card: item.card, originalIndex: index });
       return acc;
-    }, {} as Record<string, { theme: ImproTheme; cards: ImproCard[] }>);
+    }, {} as Record<string, { theme: ImproTheme; items: {card: ImproCard, originalIndex: number}[] }>);
 
     return (
       <div className="w-full flex-1 flex-col space-y-8 overflow-y-auto p-4 md:p-6">
-        {Object.values(groupedByTheme).map(({ theme, cards }) => (
+        {Object.values(groupedByTheme).map(({ theme, items }) => (
           <section key={theme.name}>
             <h2 className="mb-4 text-2xl font-headline font-bold" style={{ color: theme.color }}>
               {theme.name}
             </h2>
             <div className="flex flex-wrap content-start items-start justify-start gap-4">
-              {cards.map((card, index) => (
+              {items.map(({ card, originalIndex }) => (
                 <SingleCardDisplay
-                  key={`${card.id}-${index}`}
+                  key={`${card.id}-${originalIndex}`}
                   card={card}
                   theme={theme}
                   totalDrawn={drawnStack.length}
+                  onRemove={() => onRemoveCard(originalIndex)}
                 />
               ))}
             </div>
@@ -153,6 +168,7 @@ export function CardDisplay({ drawnStack, groupByTheme }: CardDisplayProps) {
           card={item.card}
           theme={item.theme}
           totalDrawn={drawnStack.length}
+          onRemove={() => onRemoveCard(index)}
         />
       ))}
     </div>

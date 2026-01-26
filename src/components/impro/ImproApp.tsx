@@ -96,6 +96,18 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
       description: 'Toutes les cartes tirées ont été retirées.',
     });
   }, [toast]);
+  
+  const handleRemoveCard = useCallback((indexToRemove: number) => {
+    const removedItem = drawnStack[indexToRemove];
+    if (!allowDuplicates && removedItem) {
+        setDrawnCards(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(removedItem.card.id);
+            return newSet;
+        });
+    }
+    setDrawnStack(prev => prev.filter((_, index) => index !== indexToRemove));
+  }, [drawnStack, allowDuplicates]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -115,7 +127,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           onReset={handleReset}
           onOpenThemeManager={() => setIsThemeManagerOpen(true)}
         />
-        <CardDisplay drawnStack={drawnStack} groupByTheme={groupByTheme} />
+        <CardDisplay drawnStack={drawnStack} groupByTheme={groupByTheme} onRemoveCard={handleRemoveCard} />
       </main>
       <ThemeManager
         open={isThemeManagerOpen}
