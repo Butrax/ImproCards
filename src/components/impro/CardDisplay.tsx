@@ -64,7 +64,7 @@ const SingleCardDisplay = ({ card, theme, totalDrawn }: { card: ImproCard; theme
         className={cn(
           'overflow-hidden shadow-2xl transition-all',
           borderClass,
-          isMarked && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+          isMarked && 'ring-4 ring-accent ring-offset-2 ring-offset-background'
         )}
         style={{ borderColor: theme.color }}
       >
