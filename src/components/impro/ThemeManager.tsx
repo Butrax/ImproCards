@@ -15,7 +15,6 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
@@ -56,12 +55,6 @@ export function ThemeManager({
   const handleBackToList = () => {
     setSelectedTheme(null);
     setEditedConfig(null);
-  };
-
-  const handleColorChange = (color: string) => {
-    if (editedConfig) {
-      setEditedConfig({ ...editedConfig, color });
-    }
   };
 
   const handleCardToggle = (cardFileName: string) => {
@@ -126,33 +119,13 @@ export function ThemeManager({
                 <div>
                     <SheetTitle>Gérer "{selectedTheme.name}"</SheetTitle>
                     <SheetDescription>
-                        Choisissez une couleur et sélectionnez les cartes à inclure.
+                        Sélectionnez les cartes à inclure.
                     </SheetDescription>
                 </div>
             </div>
           </SheetHeader>
           <ScrollArea className="flex-1 px-6">
             <div className="py-6 space-y-6">
-                <div className="space-y-2">
-                    <Label htmlFor="color-picker">Couleur du thème</Label>
-                    <div className="flex items-center gap-2">
-                        <Input
-                            id="color-picker"
-                            type="color"
-                            className="h-10 w-16 p-1"
-                            value={editedConfig.color || '#ffffff'}
-                            onChange={(e) => handleColorChange(e.target.value)}
-                        />
-                        <Input 
-                            type="text"
-                            className="h-10 flex-1"
-                            value={editedConfig.color || ''}
-                            onChange={(e) => handleColorChange(e.target.value)}
-                            placeholder="ex: hsl(50, 85%, 80%)"
-                        />
-                    </div>
-                </div>
-
                 <div className="space-y-2">
                     <Label>Cartes</Label>
                     <div className="space-y-2 rounded-md border p-4">
