@@ -10,6 +10,7 @@ import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
 import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw, FolderKanban } from 'lucide-react';
 import { useState } from 'react';
+import { Separator } from '@/components/ui/separator';
 
 type ControlsPanelProps = {
   themes: ImproTheme[];
@@ -42,24 +43,91 @@ export function ControlsPanel({
 }: ControlsPanelProps) {
   const [newPlayer, setNewPlayer] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  const [teamSize, setTeamSize] = useState(2);
+  const [generatedTeams, setGeneratedTeams] = useState<string[][]>([]);
+  const [allowPlayerDuplicates, setAllowPlayerDuplicates] = useState(true);
+  const [drawnPlayers, setDrawnPlayers] = useState<string[]>([]);
+
+  const resetPlayerSelections = () => {
+    setSelectedPlayer(null);
+    setGeneratedTeams([]);
+  };
 
   const handleAddPlayer = () => {
     if (newPlayer.trim() && !players.includes(newPlayer.trim())) {
       onPlayersChange([...players, newPlayer.trim()]);
       setNewPlayer('');
+      resetPlayerSelections();
+      setDrawnPlayers([]);
     }
   };
 
   const handleRemovePlayer = (playerToRemove: string) => {
     onPlayersChange(players.filter((p) => p !== playerToRemove));
+    resetPlayerSelections();
+    setDrawnPlayers([]);
   };
 
+  const handleAllowPlayerDuplicatesChange = (checked: boolean) => {
+    setAllowPlayerDuplicates(checked);
+    if (checked) {
+        setDrawnPlayers([]);
+    }
+  }
+
   const handleSelectRandomPlayer = () => {
-    if (players.length > 0) {
-      const randomPlayer = players[Math.floor(Math.random() * players.length)];
-      setSelectedPlayer(randomPlayer);
+    resetPlayerSelections();
+    if (players.length === 0) return;
+
+    let availablePlayers = players;
+    if (!allowPlayerDuplicates) {
+        availablePlayers = players.filter(p => !drawnPlayers.includes(p));
+    }
+
+    if (availablePlayers.length === 0) {
+        // All players have been drawn, reset and notify user.
+        // A toast could be used here if passed down from ImproApp.
+        // For now, we just reset the list for the next draw.
+        setDrawnPlayers([]);
+        setSelectedPlayer(null);
+        return;
+    }
+
+    const randomPlayer = availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
+    setSelectedPlayer(randomPlayer);
+
+    if (!allowPlayerDuplicates) {
+        setDrawnPlayers(prev => [...prev, randomPlayer]);
     }
   };
+
+  const handleGenerateTeams = () => {
+    if (players.length < 2 || teamSize < 2) {
+      setGeneratedTeams([]);
+      return;
+    }
+    resetPlayerSelections();
+
+    const shuffledPlayers = [...players].sort(() => 0.5 - Math.random());
+    const newTeams: string[][] = [];
+
+    while (shuffledPlayers.length > 0) {
+      newTeams.push(shuffledPlayers.splice(0, teamSize));
+    }
+
+    const lastTeam = newTeams[newTeams.length - 1];
+    if (lastTeam && lastTeam.length < teamSize) {
+      const needed = teamSize - lastTeam.length;
+      const candidates = players.filter(p => !lastTeam.includes(p));
+      const shuffledCandidates = candidates.sort(() => 0.5 - Math.random());
+      
+      const completion = shuffledCandidates.slice(0, needed);
+      lastTeam.push(...completion);
+    }
+
+    setGeneratedTeams(newTeams);
+  };
+
 
   return (
     <Card className="w-full md:w-96 lg:w-[450px] m-4 md:m-0 md:mr-4">
@@ -125,17 +193,64 @@ export function ControlsPanel({
                 ))}
               </ul>
               {players.length > 0 && (
-                <div className="text-center">
-                    <Button variant="secondary" onClick={handleSelectRandomPlayer}>
+                <>
+                  <Separator className="my-2" />
+                  <div className="space-y-4 text-center">
+                    <div>
+                      <Button variant="secondary" onClick={handleSelectRandomPlayer}>
                         <Shuffle className="mr-2 h-4 w-4"/>
                         Choisir un joueur au hasard
-                    </Button>
-                    {selectedPlayer && (
-                        <p className="mt-2 text-lg font-bold text-primary animate-in fade-in">
-                            {selectedPlayer} !
-                        </p>
-                    )}
-                </div>
+                      </Button>
+                      {selectedPlayer && (
+                          <p className="mt-2 text-lg font-bold text-primary animate-in fade-in">
+                              {selectedPlayer} !
+                          </p>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-center space-x-2 rounded-lg border p-3">
+                        <Label htmlFor="allow-player-duplicates" className="text-sm flex-grow-0">Tirages multiples</Label>
+                        <Switch
+                          id="allow-player-duplicates"
+                          checked={allowPlayerDuplicates}
+                          onCheckedChange={handleAllowPlayerDuplicatesChange}
+                        />
+                    </div>
+                  </div>
+                  
+                  <Separator className="my-2" />
+
+                  <div className="space-y-4">
+                      <h4 className="font-medium text-center">Générer des équipes</h4>
+                      <div className="flex items-center justify-center gap-2">
+                          <Label htmlFor="team-size">Taille</Label>
+                          <Input
+                              id="team-size"
+                              type="number"
+                              min="2"
+                              className="w-20"
+                              value={teamSize}
+                              onChange={(e) => setTeamSize(parseInt(e.target.value, 10) || 2)}
+                          />
+                          <Button onClick={handleGenerateTeams} disabled={players.length < 2}>
+                              <Users className="mr-2 h-4 w-4" />
+                              Générer
+                          </Button>
+                      </div>
+
+                      {generatedTeams.length > 0 && (
+                          <div className="space-y-2 pt-2">
+                              <ul className="space-y-2">
+                                  {generatedTeams.map((team, index) => (
+                                      <li key={index} className="flex items-center justify-center gap-2 rounded-md bg-muted/50 p-2 text-sm">
+                                          <span className="font-bold">Équipe {index + 1}:</span>
+                                          <span>{team.join(', ')}</span>
+                                      </li>
+                                  ))}
+                              </ul>
+                          </div>
+                      )}
+                  </div>
+                </>
               )}
             </AccordionContent>
           </AccordionItem>
