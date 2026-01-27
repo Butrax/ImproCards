@@ -5,7 +5,7 @@ import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Sparkles, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getContrastingTextColor } from '@/lib/utils';
 import { Button } from '../ui/button';
 
 type CardDisplayProps = {
@@ -18,6 +18,7 @@ const SingleCardDisplay = ({ card, theme, totalDrawn, onRemove }: { card: ImproC
   const defaultImageUrl = '/Cartes/défaut.png';
   const [imageUrl, setImageUrl] = useState(card.image.imageUrl);
   const [isMarked, setIsMarked] = useState(false);
+  const textColor = getContrastingTextColor(theme.color);
 
   useEffect(() => {
     setImageUrl(card.image.imageUrl);
@@ -32,7 +33,6 @@ const SingleCardDisplay = ({ card, theme, totalDrawn, onRemove }: { card: ImproC
   let titleClass = 'text-3xl';
   let themeClass = 'text-sm';
   let paddingClass = 'p-4';
-  let borderClass = 'border-4';
 
   if (totalDrawn >= 2 && totalDrawn <= 3) {
     containerClass = 'max-w-xs'; // ~320px
@@ -41,19 +41,16 @@ const SingleCardDisplay = ({ card, theme, totalDrawn, onRemove }: { card: ImproC
     containerClass = 'max-w-[280px]';
     titleClass = 'text-xl';
     paddingClass = 'p-3';
-    borderClass = 'border-2';
     themeClass = 'text-xs';
   } else if (totalDrawn >= 7 && totalDrawn <= 12) {
     containerClass = 'max-w-[240px]';
     titleClass = 'text-lg';
     paddingClass = 'p-3';
-    borderClass = 'border-2';
     themeClass = 'text-xs';
   } else if (totalDrawn > 12) {
     containerClass = 'max-w-[200px]';
     titleClass = 'text-base';
     paddingClass = 'p-2';
-    borderClass = 'border-2';
     themeClass = 'text-[10px]';
   }
 
@@ -76,18 +73,22 @@ const SingleCardDisplay = ({ card, theme, totalDrawn, onRemove }: { card: ImproC
         </Button>
       <Card
         className={cn(
-          'overflow-hidden shadow-2xl transition-all h-full',
-          borderClass,
+          'overflow-hidden shadow-2xl transition-all h-full flex flex-col',
           isMarked && 'ring-4 ring-black ring-offset-2 ring-offset-background'
         )}
-        style={{ borderColor: theme.color }}
       >
-        <CardHeader className={cn('text-center', paddingClass)}>
-          <CardDescription className={cn('font-bold uppercase tracking-widest', themeClass)} style={{ color: theme.color }}>
+        <CardHeader 
+            className={cn('text-center', paddingClass)} 
+            style={{ backgroundColor: theme.color, color: textColor }}
+        >
+          <CardDescription 
+            className={cn('font-bold uppercase tracking-widest', themeClass)} 
+            style={{ color: textColor }}
+          >
             {card.themeName}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 flex-grow">
           <div className="aspect-[3/2] w-full bg-muted">
             <Image
               src={imageUrl}
@@ -100,10 +101,13 @@ const SingleCardDisplay = ({ card, theme, totalDrawn, onRemove }: { card: ImproC
               priority
             />
           </div>
-          <div className={cn('text-center', paddingClass)}>
-            <CardTitle className={cn('font-headline', titleClass)}>{card.name}</CardTitle>
-          </div>
         </CardContent>
+         <div 
+            className={cn('text-center', paddingClass)}
+            style={{ backgroundColor: theme.color, color: textColor }}
+        >
+            <CardTitle className={cn('font-headline', titleClass)}>{card.name}</CardTitle>
+        </div>
       </Card>
     </div>
   );
