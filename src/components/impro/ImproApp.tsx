@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ImproCard, ImproTheme } from '@/lib/impro-types';
 import { Header } from './Header';
@@ -23,9 +23,51 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
   const [groupByTheme, setGroupByTheme] = useState(false);
   const [drawnCards, setDrawnCards] = useState<Set<string>>(new Set());
   const [players, setPlayers] = useState<string[]>([]);
+  const [excludedCards, setExcludedCards] = useState<Record<string, string[]>>({});
   const { toast } = useToast();
   const [isThemeManagerOpen, setIsThemeManagerOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const savedPlayers = localStorage.getItem('impro-app-players');
+      if (savedPlayers) {
+        setPlayers(JSON.parse(savedPlayers));
+      }
+      const savedExcludedCards = localStorage.getItem('impro-app-excluded-cards');
+      if (savedExcludedCards) {
+        setExcludedCards(JSON.parse(savedExcludedCards));
+      }
+    } catch (e) {
+      console.error('Could not load data from localStorage.', e);
+    }
+  }, []);
+
+  const handlePlayersChange = useCallback((newPlayers: string[]) => {
+    setPlayers(newPlayers);
+    try {
+      localStorage.setItem('impro-app-players', JSON.stringify(newPlayers));
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder les joueurs.',
+      });
+    }
+  }, [toast]);
+  
+  const handleExcludedCardsChange = useCallback((newExcludedConfig: Record<string, string[]>) => {
+    setExcludedCards(newExcludedConfig);
+    try {
+      localStorage.setItem('impro-app-excluded-cards', JSON.stringify(newExcludedConfig));
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder la configuration des thèmes.',
+      });
+    }
+  }, [toast]);
 
   const handleThemeToggle = useCallback((themeName: string) => {
     setSelectedThemes((prev) =>
@@ -42,14 +84,20 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
   const cardPool = useMemo(() => {
     let pool = allThemes
       .filter((theme) => selectedThemes.includes(theme.name))
-      .flatMap((theme) => theme.cards);
+      .flatMap((theme) => {
+        const excludedForTheme = excludedCards[theme.name] || [];
+        return (theme.cards || []).filter(card => {
+            const fileName = card.image.imageUrl.split('/').pop();
+            return fileName ? !excludedForTheme.includes(fileName) : true;
+        });
+      });
     
     if (!allowDuplicates) {
       pool = pool.filter((card) => !drawnCards.has(card.id));
     }
     
     return pool;
-  }, [selectedThemes, allowDuplicates, drawnCards, allThemes]);
+  }, [selectedThemes, allowDuplicates, drawnCards, allThemes, excludedCards]);
 
   const handleDrawCard = () => {
     if (cardPool.length === 0) {
@@ -62,7 +110,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
       } else {
          toast({
           title: 'Aucune carte à tirer',
-          description: 'Veuillez sélectionner au moins un thème.',
+          description: 'Veuillez sélectionner au moins un thème ou vérifier les cartes exclues.',
           variant: 'destructive',
         });
       }
@@ -122,7 +170,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           groupByTheme={groupByTheme}
           onGroupByThemeChange={setGroupByTheme}
           players={players}
-          onPlayersChange={setPlayers}
+          onPlayersChange={handlePlayersChange}
           onDrawCard={handleDrawCard}
           onReset={handleReset}
           onOpenThemeManager={() => setIsThemeManagerOpen(true)}
@@ -133,6 +181,8 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
         open={isThemeManagerOpen}
         onOpenChange={setIsThemeManagerOpen}
         onThemesUpdate={handleThemesUpdate}
+        excludedCards={excludedCards}
+        onExcludedCardsChange={handleExcludedCardsChange}
       />
     </div>
   );

@@ -40,7 +40,6 @@ export async function getThemesForManager(): Promise<ManagedTheme[]> {
           name: themeNameFormatted,
           config: {
             color: config.color,
-            excludedCards: config.excludedCards || [],
           },
           allCards: cardFiles,
         };
@@ -51,34 +50,5 @@ export async function getThemesForManager(): Promise<ManagedTheme[]> {
   } catch (error) {
     console.error("Error getting themes for manager:", error);
     return [];
-  }
-}
-
-// Action to save a theme's config
-export async function saveThemeConfig(
-  themeName: string,
-  config: ThemeConfig
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    // Find the original directory name which might have different casing
-    const dirs = await fs.readdir(cartesDirectory);
-    const dirName = dirs.find(d => d.toLowerCase() === themeName.toLowerCase());
-
-    if (!dirName) {
-         throw new Error(`Theme directory not found for: ${themeName}`);
-    }
-
-    const themePath = path.join(cartesDirectory, dirName);
-    const configPath = path.join(themePath, configFileName);
-
-    if (! (await fs.stat(themePath)).isDirectory()) {
-         throw new Error(`Theme path is not a directory: ${themePath}`);
-    }
-
-    await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
-    return { success: true };
-  } catch (error: any) {
-    console.error(`Error saving config for theme ${themeName}:`, error);
-    return { success: false, error: error.message };
   }
 }

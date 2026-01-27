@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
-import type { ManagedTheme, ThemeConfig } from '@/lib/impro-types';
-import { getThemesForManager, saveThemeConfig } from '@/lib/theme-actions';
+import { useEffect, useState } from 'react';
+import type { ManagedTheme } from '@/lib/impro-types';
+import { getThemesForManager } from '@/lib/theme-actions';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -10,37 +10,35 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  SheetFooter,
 } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
 type ThemeManagerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onThemesUpdate: () => void;
+  excludedCards: Record<string, string[]>;
+  onExcludedCardsChange: (config: Record<string, string[]>) => void;
 };
 
 export function ThemeManager({
   open,
   onOpenChange,
   onThemesUpdate,
+  excludedCards,
+  onExcludedCardsChange,
 }: ThemeManagerProps) {
   const [themes, setThemes] = useState<ManagedTheme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<ManagedTheme | null>(null);
-  const [editedConfig, setEditedConfig] = useState<ThemeConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, startSaving] = useTransition();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (open) {
       setIsLoading(true);
       setSelectedTheme(null);
-      setEditedConfig(null);
       getThemesForManager()
         .then(setThemes)
         .finally(() => setIsLoading(false));
@@ -49,48 +47,30 @@ export function ThemeManager({
 
   const handleSelectTheme = (theme: ManagedTheme) => {
     setSelectedTheme(theme);
-    setEditedConfig(JSON.parse(JSON.stringify(theme.config))); // Deep copy
   };
 
   const handleBackToList = () => {
     setSelectedTheme(null);
-    setEditedConfig(null);
   };
 
   const handleCardToggle = (cardFileName: string) => {
-    if (editedConfig) {
-      const currentExcluded = editedConfig.excludedCards || [];
+    if (selectedTheme) {
+      const themeName = selectedTheme.name;
+      const currentExcluded = excludedCards[themeName] || [];
       const newExcluded = currentExcluded.includes(cardFileName)
         ? currentExcluded.filter((c) => c !== cardFileName)
         : [...currentExcluded, cardFileName];
-      setEditedConfig({ ...editedConfig, excludedCards: newExcluded });
+      onExcludedCardsChange({ ...excludedCards, [themeName]: newExcluded });
+    }
+  };
+  
+  const handleSheetOpenChange = (isOpen: boolean) => {
+    onOpenChange(isOpen);
+    if (!isOpen) {
+      onThemesUpdate();
     }
   };
 
-  const handleSave = () => {
-    if (!selectedTheme || !editedConfig) return;
-
-    startSaving(async () => {
-      const result = await saveThemeConfig(selectedTheme.name, editedConfig);
-      if (result.success) {
-        toast({
-          title: 'Thème sauvegardé',
-          description: `La configuration pour "${selectedTheme.name}" a été mise à jour.`,
-        });
-        onThemesUpdate();
-        handleBackToList();
-        // Refetch themes to have the latest state
-        getThemesForManager().then(setThemes);
-      } else {
-        toast({
-          title: 'Erreur',
-          description: result.error || 'Impossible de sauvegarder le thème.',
-          variant: 'destructive',
-        });
-      }
-    });
-  };
-  
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -108,7 +88,8 @@ export function ThemeManager({
       );
     }
 
-    if (selectedTheme && editedConfig) {
+    if (selectedTheme) {
+      const themeExcludedCards = excludedCards[selectedTheme.name] || [];
       return (
         <>
           <SheetHeader className="border-b px-6 pb-4">
@@ -133,7 +114,7 @@ export function ThemeManager({
                             <div key={cardFile} className="flex items-center space-x-2">
                                 <Checkbox
                                     id={`card-${cardFile}`}
-                                    checked={!editedConfig.excludedCards?.includes(cardFile)}
+                                    checked={!themeExcludedCards.includes(cardFile)}
                                     onCheckedChange={() => handleCardToggle(cardFile)}
                                 />
                                 <Label htmlFor={`card-${cardFile}`} className="font-normal text-sm">
@@ -145,12 +126,6 @@ export function ThemeManager({
                 </div>
             </div>
           </ScrollArea>
-           <SheetFooter className="border-t px-6 py-4">
-            <Button onClick={handleSave} disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sauvegarder
-            </Button>
-          </SheetFooter>
         </>
       );
     }
@@ -186,7 +161,7 @@ export function ThemeManager({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent className="flex w-full flex-col p-0 sm:max-w-md">
         {renderContent()}
       </SheetContent>

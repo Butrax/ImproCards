@@ -18,7 +18,6 @@ export interface ImproTheme {
 // New types for management
 export interface ThemeConfig {
   color?: string;
-  excludedCards?: string[];
 }
 
 // This will be the data structure for the management UI

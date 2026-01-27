@@ -48,13 +48,10 @@ export const generateThemes = (): ImproTheme[] => {
         .readdirSync(themePath)
         .filter(file => /\.(jpeg|jpg|png|gif|bmp)$/i.test(file));
       
-      const excludedCardsSet = new Set(config.excludedCards || []);
-      const includedCardFiles = allCardFiles.filter(fileName => !excludedCardsSet.has(fileName));
-
       const themeNameFormatted =
         themeName.charAt(0).toUpperCase() + themeName.slice(1);
 
-      const cards: ImproCard[] = includedCardFiles.map(fileName => {
+      const cards: ImproCard[] = allCardFiles.map(fileName => {
         const cardName = path.parse(fileName).name.replace(/[-_]/g, ' ');
         const formattedCardName =
           cardName.charAt(0).toUpperCase() + cardName.slice(1);
