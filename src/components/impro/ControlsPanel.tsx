@@ -16,6 +16,8 @@ type ControlsPanelProps = {
   themes: ImproTheme[];
   selectedThemes: string[];
   onThemeToggle: (themeName: string) => void;
+  onSelectAllThemes: (checked: boolean) => void;
+  themesCheckboxState: boolean | 'indeterminate';
   allowDuplicates: boolean;
   onAllowDuplicatesChange: (checked: boolean) => void;
   groupByTheme: boolean;
@@ -31,6 +33,8 @@ export function ControlsPanel({
   themes,
   selectedThemes,
   onThemeToggle,
+  onSelectAllThemes,
+  themesCheckboxState,
   allowDuplicates,
   onAllowDuplicatesChange,
   groupByTheme,
@@ -148,6 +152,14 @@ export function ControlsPanel({
               </div>
             </AccordionTrigger>
             <AccordionContent className="space-y-2 pt-2">
+               <div className="flex items-center space-x-2 border-b pb-2 mb-2">
+                <Checkbox
+                  id="select-all-themes"
+                  checked={themesCheckboxState}
+                  onCheckedChange={onSelectAllThemes as (checked: boolean) => void}
+                />
+                <Label htmlFor="select-all-themes" className="text-base font-medium">Tout sélectionner</Label>
+              </div>
               {themes.map((theme) => (
                 <div key={theme.name} className="flex items-center space-x-2">
                   <Checkbox

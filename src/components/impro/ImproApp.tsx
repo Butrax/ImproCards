@@ -77,6 +77,10 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
     );
   }, []);
 
+  const handleSelectAllThemes = useCallback((checked: boolean) => {
+    setSelectedThemes(checked ? allThemes.map(t => t.name) : []);
+  }, [allThemes]);
+
   const handleThemesUpdate = useCallback(() => {
     router.refresh();
   }, [router]);
@@ -157,6 +161,11 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
     setDrawnStack(prev => prev.filter((_, index) => index !== indexToRemove));
   }, [drawnStack, allowDuplicates]);
 
+  const areAllThemesSelected = allThemes.length > 0 && selectedThemes.length === allThemes.length;
+  const isAnyThemeSelected = selectedThemes.length > 0;
+  const themesCheckboxState = areAllThemesSelected ? true : (isAnyThemeSelected ? 'indeterminate' : false);
+
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
@@ -165,6 +174,8 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           themes={allThemes}
           selectedThemes={selectedThemes}
           onThemeToggle={handleThemeToggle}
+          onSelectAllThemes={handleSelectAllThemes}
+          themesCheckboxState={themesCheckboxState}
           allowDuplicates={allowDuplicates}
           onAllowDuplicatesChange={setAllowDuplicates}
           groupByTheme={groupByTheme}

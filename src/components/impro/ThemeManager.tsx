@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { ManagedTheme } from '@/lib/impro-types';
 import { getThemesForManager } from '@/lib/theme-actions';
 import { Button } from '@/components/ui/button';
@@ -60,10 +60,32 @@ export function ThemeManager({
       const newExcluded = currentExcluded.includes(cardFileName)
         ? currentExcluded.filter((c) => c !== cardFileName)
         : [...currentExcluded, cardFileName];
-      onExcludedCardsChange({ ...excludedCards, [themeName]: newExcluded });
+      
+      const newExcludedCards = { ...excludedCards };
+      if (newExcluded.length > 0) {
+        newExcludedCards[themeName] = newExcluded;
+      } else {
+        delete newExcludedCards[themeName];
+      }
+      onExcludedCardsChange(newExcludedCards);
     }
   };
   
+  const handleToggleAllCards = useCallback((checked: boolean) => {
+    if (selectedTheme) {
+        const themeName = selectedTheme.name;
+        if (checked) {
+            // Un-exclude all: remove the theme from the excludedCards record
+            const newExcludedCards = { ...excludedCards };
+            delete newExcludedCards[themeName];
+            onExcludedCardsChange(newExcludedCards);
+        } else {
+            // Exclude all: add all card files to the record
+            onExcludedCardsChange({ ...excludedCards, [themeName]: selectedTheme.allCards });
+        }
+    }
+  }, [selectedTheme, excludedCards, onExcludedCardsChange]);
+
   const handleSheetOpenChange = (isOpen: boolean) => {
     onOpenChange(isOpen);
     if (!isOpen) {
@@ -90,6 +112,14 @@ export function ThemeManager({
 
     if (selectedTheme) {
       const themeExcludedCards = excludedCards[selectedTheme.name] || [];
+      const allCardsInTheme = selectedTheme.allCards;
+      
+      const areAllCardsSelected = allCardsInTheme.length > 0 && themeExcludedCards.length === 0;
+      const areNoCardsSelected = allCardsInTheme.length > 0 && themeExcludedCards.length === allCardsInTheme.length;
+
+      const cardsCheckboxState = areAllCardsSelected ? true : (areNoCardsSelected ? false : 'indeterminate');
+
+
       return (
         <>
           <SheetHeader className="border-b px-6 pb-4">
@@ -110,7 +140,18 @@ export function ThemeManager({
                 <div className="space-y-2">
                     <Label>Cartes</Label>
                     <div className="space-y-2 rounded-md border p-4">
-                        {selectedTheme.allCards.map((cardFile) => (
+                        <div className="flex items-center space-x-2 border-b pb-2 mb-2">
+                            <Checkbox
+                                id={`select-all-cards-${selectedTheme.name}`}
+                                checked={cardsCheckboxState}
+                                onCheckedChange={(checked) => handleToggleAllCards(Boolean(checked))}
+                                disabled={allCardsInTheme.length === 0}
+                            />
+                            <Label htmlFor={`select-all-cards-${selectedTheme.name}`} className="font-medium text-sm">
+                                Tout sélectionner
+                            </Label>
+                        </div>
+                        {allCardsInTheme.length > 0 ? allCardsInTheme.map((cardFile) => (
                             <div key={cardFile} className="flex items-center space-x-2">
                                 <Checkbox
                                     id={`card-${cardFile}`}
@@ -121,7 +162,9 @@ export function ThemeManager({
                                     {cardFile.replace(/\.(jpeg|jpg|png|gif|bmp)$/i, '').replace(/[-_]/g, ' ')}
                                 </Label>
                             </div>
-                        ))}
+                        )) : (
+                            <p className="text-sm text-muted-foreground text-center py-4">Aucune carte dans ce thème.</p>
+                        )}
                     </div>
                 </div>
             </div>
