@@ -8,7 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
-import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw, FolderKanban } from 'lucide-react';
+import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw, FolderKanban, Target } from 'lucide-react';
 import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 
@@ -27,6 +27,7 @@ type ControlsPanelProps = {
   onDrawCard: () => void;
   onReset: () => void;
   onOpenThemeManager: () => void;
+  onOpenAdvancedDraw: () => void;
 };
 
 export function ControlsPanel({
@@ -44,6 +45,7 @@ export function ControlsPanel({
   onDrawCard,
   onReset,
   onOpenThemeManager,
+  onOpenAdvancedDraw,
 }: ControlsPanelProps) {
   const [newPlayer, setNewPlayer] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -301,6 +303,10 @@ export function ControlsPanel({
         <Button size="lg" className="w-full text-lg" onClick={onDrawCard}>
           <Wand2 className="mr-2 h-5 w-5" />
           Tirer une carte !
+        </Button>
+        <Button variant="secondary" className="w-full" onClick={onOpenAdvancedDraw}>
+          <Target className="mr-2 h-4 w-4" />
+          Tirage Avancé
         </Button>
          <Button variant="outline" className="w-full" onClick={onReset}>
           <RotateCcw className="mr-2 h-4 w-4" />

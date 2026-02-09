@@ -8,6 +8,7 @@ import { CardDisplay } from './CardDisplay';
 import { ControlsPanel } from './ControlsPanel';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeManager } from './ThemeManager';
+import { AdvancedDrawManager } from './AdvancedDrawManager';
 
 type DrawnItem = {
   card: ImproCard;
@@ -26,6 +27,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
   const [excludedCards, setExcludedCards] = useState<Record<string, string[]>>({});
   const { toast } = useToast();
   const [isThemeManagerOpen, setIsThemeManagerOpen] = useState(false);
+  const [isAdvancedDrawOpen, setIsAdvancedDrawOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -140,6 +142,27 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
     }
   };
 
+  const handleAdvancedDraw = useCallback((cardsToDraw: ImproCard[]) => {
+    const newDrawnItems: DrawnItem[] = [];
+    const newDrawnCardIds = new Set<string>();
+    
+    cardsToDraw.forEach(card => {
+        const theme = allThemes.find(t => t.name === card.themeName);
+        if (theme) {
+            newDrawnItems.push({ card, theme });
+            if (!allowDuplicates) {
+                newDrawnCardIds.add(card.id);
+            }
+        }
+    });
+
+    setDrawnStack(prev => [...prev, ...newDrawnItems]);
+
+    if (!allowDuplicates) {
+      setDrawnCards(prev => new Set([...prev, ...newDrawnCardIds]));
+    }
+  }, [allThemes, allowDuplicates]);
+
   const handleReset = useCallback(() => {
     setDrawnStack([]);
     setDrawnCards(new Set());
@@ -185,6 +208,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
           onDrawCard={handleDrawCard}
           onReset={handleReset}
           onOpenThemeManager={() => setIsThemeManagerOpen(true)}
+          onOpenAdvancedDraw={() => setIsAdvancedDrawOpen(true)}
         />
         <CardDisplay drawnStack={drawnStack} groupByTheme={groupByTheme} onRemoveCard={handleRemoveCard} />
       </main>
@@ -194,6 +218,12 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
         onThemesUpdate={handleThemesUpdate}
         excludedCards={excludedCards}
         onExcludedCardsChange={handleExcludedCardsChange}
+      />
+      <AdvancedDrawManager
+        open={isAdvancedDrawOpen}
+        onOpenChange={setIsAdvancedDrawOpen}
+        allThemes={allThemes}
+        onDraw={handleAdvancedDraw}
       />
     </div>
   );
