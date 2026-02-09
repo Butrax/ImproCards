@@ -105,6 +105,17 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
     return pool;
   }, [selectedThemes, allowDuplicates, drawnCards, allThemes, excludedCards]);
 
+  const filteredThemesForAdvancedDraw = useMemo(() => {
+    return allThemes.map(theme => {
+      const excludedForTheme = excludedCards[theme.name] || [];
+      const filteredCards = (theme.cards || []).filter(card => {
+        const fileName = card.image.imageUrl.split('/').pop();
+        return fileName ? !excludedForTheme.includes(fileName) : true;
+      });
+      return { ...theme, cards: filteredCards };
+    });
+  }, [allThemes, excludedCards]);
+
   const handleDrawCard = () => {
     if (cardPool.length === 0) {
       if (!allowDuplicates && drawnCards.size > 0) {
@@ -222,7 +233,7 @@ export function ImproApp({ allThemes }: { allThemes: ImproTheme[] }) {
       <AdvancedDrawManager
         open={isAdvancedDrawOpen}
         onOpenChange={setIsAdvancedDrawOpen}
-        allThemes={allThemes}
+        allThemes={filteredThemesForAdvancedDraw}
         onDraw={handleAdvancedDraw}
       />
     </div>
