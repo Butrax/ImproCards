@@ -9,8 +9,9 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
 import { Drama, Settings, Trash2, Users, Wand2, Shuffle, Plus, Settings2, RotateCcw, FolderKanban, Target } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type ControlsPanelProps = {
   themes: ImproTheme[];
@@ -47,12 +48,18 @@ export function ControlsPanel({
   onOpenThemeManager,
   onOpenAdvancedDraw,
 }: ControlsPanelProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const [newPlayer, setNewPlayer] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [teamSize, setTeamSize] = useState(2);
   const [generatedTeams, setGeneratedTeams] = useState<string[][]>([]);
   const [allowPlayerDuplicates, setAllowPlayerDuplicates] = useState(true);
   const [drawnPlayers, setDrawnPlayers] = useState<string[]>([]);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
 
   const resetPlayerSelections = () => {
     setSelectedPlayer(null);
@@ -91,9 +98,6 @@ export function ControlsPanel({
     }
 
     if (availablePlayers.length === 0) {
-        // All players have been drawn, reset and notify user.
-        // A toast could be used here if passed down from ImproApp.
-        // For now, we just reset the list for the next draw.
         setDrawnPlayers([]);
         setSelectedPlayer(null);
         return;
@@ -133,7 +137,30 @@ export function ControlsPanel({
 
     setGeneratedTeams(newTeams);
   };
-
+  
+  if (!isMounted) {
+    return (
+      <Card className="w-full md:w-96 lg:w-[450px] m-4 md:m-0 md:mr-4">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="font-headline text-2xl">Panneau de Contrôle</CardTitle>
+          <Button variant="ghost" size="icon" disabled>
+              <Settings2 className="h-6 w-6" />
+              <span className="sr-only">Gérer les thèmes</span>
+          </Button>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+            <div className="space-y-1">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+            </div>
+            <Skeleton className="h-11 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full md:w-96 lg:w-[450px] m-4 md:m-0 md:mr-4">
